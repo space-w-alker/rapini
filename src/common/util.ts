@@ -359,7 +359,7 @@ export function createParams(
   pathParams: OpenAPIV3.PathItemObject["parameters"]
 ) {
   if (!item.parameters && !pathParams) {
-    return [];
+    return { params: [], queryParams: [], otherParams: [] };
   }
 
   const { queryParams, pathParams: otherParams } = combineUniqueParams(
@@ -407,7 +407,7 @@ export function createParams(
       ),
     });
   }
-  return itemParamsDeclarations;
+  return { params: itemParamsDeclarations, queryParams, otherParams };
 }
 
 function resolveParams(

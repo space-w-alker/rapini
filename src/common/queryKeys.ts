@@ -132,7 +132,7 @@ function makeQueryKey(
   }
 
   const normalizedOperationId = normalizeOperationId(get.operationId);
-  const params = createParams($refs, get, pathParams);
+  const { params, queryParams } = createParams($refs, get, pathParams);
 
   return ts.factory.createPropertyAssignment(
     /*name*/ ts.factory.createIdentifier(normalizedOperationId),
@@ -148,16 +148,27 @@ function makeQueryKey(
         ts.factory.createArrayLiteralExpression(
           /*elements*/ [
             ts.factory.createStringLiteral(normalizedOperationId),
-            ...params.map((p) =>
-              p.required
-                ? p.name
-                : ts.factory.createCallExpression(
-                    /*expression*/ ts.factory.createIdentifier(
-                      NULL_IF_UNDEFINED_FN_NAME
-                    ),
-                    /*typeArguments*/ undefined,
-                    /*argumentsArray*/ [p.name]
-                  )
+            ...params
+              .filter((p) => p.name.text !== "params")
+              .map((p) =>
+                p.required
+                  ? p.name
+                  : ts.factory.createCallExpression(
+                      /*expression*/ ts.factory.createIdentifier(
+                        NULL_IF_UNDEFINED_FN_NAME
+                      ),
+                      /*typeArguments*/ undefined,
+                      /*argumentsArray*/ [p.name]
+                    )
+              ),
+            ...queryParams.map((p) =>
+              ts.factory.createCallExpression(
+                /*expression*/ ts.factory.createIdentifier(
+                  NULL_IF_UNDEFINED_FN_NAME
+                ),
+                /*typeArguments*/ undefined,
+                /*argumentsArray*/ [createOneParamKey(p.name)]
+              )
             ),
           ],
           /*multiline*/ false
@@ -180,5 +191,13 @@ function makeExportQueryKeyType(): ts.TypeAliasDeclaration {
       ts.factory.createIdentifier("queryKeys"),
       undefined
     )
+  );
+}
+
+function createOneParamKey(name: string) {
+  return ts.factory.createPropertyAccessChain(
+    ts.factory.createIdentifier("params"),
+    ts.factory.createToken(ts.SyntaxKind.QuestionDotToken),
+    ts.factory.createIdentifier(name)
   );
 }

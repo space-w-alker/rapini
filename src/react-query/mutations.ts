@@ -142,30 +142,20 @@ function optionsParameterDeclaration(
               ]
             ),
             ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-            hasRequestBody
-              ? ts.factory.createIndexedAccessTypeNode(
-                  /*objectType*/ ts.factory.createTypeReferenceNode(
-                    /*typeName*/ ts.factory.createIdentifier("Parameters"),
-                    /*typeArguments*/ [
-                      ts.factory.createIndexedAccessTypeNode(
-                        ts.factory.createTypeReferenceNode(
-                          ts.factory.createIdentifier("Requests"),
-                          undefined
-                        ),
-                        ts.factory.createLiteralTypeNode(
-                          ts.factory.createStringLiteral(requestIdentifier)
-                        )
-                      ),
-                    ]
+            ts.factory.createTypeReferenceNode(
+              /*typeName*/ ts.factory.createIdentifier("Parameters"),
+              /*typeArguments*/ [
+                ts.factory.createIndexedAccessTypeNode(
+                  ts.factory.createTypeReferenceNode(
+                    ts.factory.createIdentifier("Requests"),
+                    undefined
                   ),
-                  /*indexType*/ ts.factory.createLiteralTypeNode(
-                    /*literal*/ ts.factory.createNumericLiteral(
-                      /*value*/ "0",
-                      /*numericLiteralFlags*/ undefined
-                    )
+                  ts.factory.createLiteralTypeNode(
+                    ts.factory.createStringLiteral(requestIdentifier)
                   )
-                )
-              : ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+                ),
+              ]
+            ),
             ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
           ]
         ),
@@ -192,7 +182,7 @@ function makeProperty(
   const normalizedOperationId = normalizeOperationId(operationId);
 
   const identifier = `use${capitalizeFirstLetter(normalizedOperationId)}`;
-  const params = createParams($refs, operation, pathParams);
+  const { params } = createParams($refs, operation, pathParams);
 
   const hasRequestBody = !!operation.requestBody;
 
@@ -208,36 +198,26 @@ function makeProperty(
         ]
       ),
       ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-      hasRequestBody
-        ? ts.factory.createIndexedAccessTypeNode(
-            /*objectType*/ ts.factory.createTypeReferenceNode(
-              /*typeName*/ ts.factory.createIdentifier("Parameters"),
-              /*typeArguments*/ [
-                ts.factory.createIndexedAccessTypeNode(
-                  ts.factory.createTypeReferenceNode(
-                    ts.factory.createIdentifier("Requests"),
-                    undefined
-                  ),
-                  ts.factory.createLiteralTypeNode(
-                    ts.factory.createStringLiteral(normalizedOperationId)
-                  )
-                ),
-              ]
+      ts.factory.createTypeReferenceNode(
+        /*typeName*/ ts.factory.createIdentifier("Parameters"),
+        /*typeArguments*/ [
+          ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createTypeReferenceNode(
+              ts.factory.createIdentifier("Requests"),
+              undefined
             ),
-            /*indexType*/ ts.factory.createLiteralTypeNode(
-              /*literal*/ ts.factory.createNumericLiteral(
-                /*value*/ "0",
-                /*numericLiteralFlags*/ undefined
-              )
+            ts.factory.createLiteralTypeNode(
+              ts.factory.createStringLiteral(normalizedOperationId)
             )
-          )
-        : ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+          ),
+        ]
+      ),
     ],
     /*args*/ [
       ts.factory.createArrowFunction(
         /*modifiers*/ undefined,
         /*typeParameters*/ undefined,
-        /*parameters*/ hasRequestBody
+        /*parameters*/ hasRequestBody || params.length
           ? [
               ts.factory.createParameterDeclaration(
                 /*modifiers*/ undefined,
@@ -261,10 +241,23 @@ function makeProperty(
           /*typeArguments*/ undefined,
           /*args*/ hasRequestBody
             ? [
-                ts.factory.createIdentifier("payload"),
-                ...params.map((p) => p.name),
+                ts.factory.createElementAccessExpression(
+                  ts.factory.createIdentifier("payload"),
+                  ts.factory.createNumericLiteral(0)
+                ),
+                ...params.map((p, idx) =>
+                  ts.factory.createElementAccessExpression(
+                    ts.factory.createIdentifier("payload"),
+                    ts.factory.createNumericLiteral(idx + 1)
+                  )
+                ),
               ]
-            : params.map((p) => p.name)
+            : params.map((p, idx) =>
+                ts.factory.createElementAccessExpression(
+                  ts.factory.createIdentifier("payload"),
+                  ts.factory.createNumericLiteral(idx)
+                )
+              )
         )
       ),
       ts.factory.createPropertyAccessChain(
@@ -285,7 +278,6 @@ function makeProperty(
         /*modifiers*/ undefined,
         /*typeParameters*/ undefined,
         /*parameters*/ [
-          ...params.map((p) => p.arrowFuncParam),
           optionsParameterDeclaration(normalizedOperationId, hasRequestBody),
         ],
         /*type*/ undefined,
@@ -329,31 +321,20 @@ function makeProperty(
                   ]
                 ),
                 ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-                hasRequestBody
-                  ? ts.factory.createIndexedAccessTypeNode(
+                ts.factory.createTypeReferenceNode(
+                  ts.factory.createIdentifier("Parameters"),
+                  [
+                    ts.factory.createIndexedAccessTypeNode(
                       ts.factory.createTypeReferenceNode(
-                        ts.factory.createIdentifier("Parameters"),
-                        [
-                          ts.factory.createIndexedAccessTypeNode(
-                            ts.factory.createTypeReferenceNode(
-                              ts.factory.createIdentifier("Requests"),
-                              undefined
-                            ),
-                            ts.factory.createLiteralTypeNode(
-                              ts.factory.createStringLiteral(
-                                normalizedOperationId
-                              )
-                            )
-                          ),
-                        ]
+                        ts.factory.createIdentifier("Requests"),
+                        undefined
                       ),
                       ts.factory.createLiteralTypeNode(
-                        ts.factory.createNumericLiteral("0")
+                        ts.factory.createStringLiteral(normalizedOperationId)
                       )
-                    )
-                  : ts.factory.createKeywordTypeNode(
-                      ts.SyntaxKind.UnknownKeyword
                     ),
+                  ]
+                ),
                 ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
               ]
             ),
