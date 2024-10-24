@@ -69,7 +69,7 @@ function makeProperty(
   const normalizedOperationId = normalizeOperationId(get.operationId);
   const identifierName = `use${capitalizeFirstLetter(normalizedOperationId)}`;
 
-  const params = createParams($refs, get, pathParams);
+  const { params } = createParams($refs, get, pathParams);
 
   return ts.factory.createPropertyAssignment(
     /*name*/ ts.factory.createIdentifier(identifierName),

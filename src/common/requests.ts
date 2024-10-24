@@ -94,7 +94,6 @@ function exportResponseType() {
 function makeRequestsDeclaration(
   requests: ReturnType<typeof makeRequestsPropertyAssignment>
 ) {
-  console.log(requests.map((request) => request.name)[0]);
   const bodyStatements = [
     ts.factory.createReturnStatement(
       /*expression*/ ts.factory.createAsExpression(
@@ -271,7 +270,7 @@ function makeAxiosRequestGenericType(
       {
         statusType: StatusType;
         schemas: ReturnType<typeof schemaObjectOrRefType>[];
-      }
+      },
     ]
   | [] {
   const obj = isReferenceObject(resOrRef)
