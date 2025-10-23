@@ -172,24 +172,48 @@ function isRequestBodyObject(
 
 function createRequestParams(
   item: OpenAPIV3.OperationObject,
-  paramObjects: OpenAPIV3.ParameterObject[],
+  queryParams: OpenAPIV3.ParameterObject[],
+  otherParams: OpenAPIV3.ParameterObject[],
   $refs: SwaggerParser.$Refs
 ): { name: ts.Identifier; arrowFuncParam: ts.ParameterDeclaration }[] {
-  const itemParamsDeclarations = paramObjects
-    .sort((x, y) => (x.required === y.required ? 0 : x.required ? -1 : 1)) // put all optional values at the end
-    .map((param) => ({
-      name: ts.factory.createIdentifier(param.name),
+  const itemParamsDeclarations = otherParams.map((p) => ({
+    name: ts.factory.createIdentifier(p.name),
+    arrowFuncParam: ts.factory.createParameterDeclaration(
+      undefined,
+      undefined,
+      ts.factory.createIdentifier(p.name),
+      undefined,
+      schemaObjectOrRefType($refs, p.schema).node
+    ),
+  }));
+
+  if (queryParams.length) {
+    itemParamsDeclarations.push({
+      name: ts.factory.createIdentifier("params"),
       arrowFuncParam: ts.factory.createParameterDeclaration(
-        /*modifiers*/ undefined,
-        /*dotDotDotToken*/ undefined,
-        /*name*/ ts.factory.createIdentifier(param.name),
-        /*questionToken*/ param.required
-          ? undefined
-          : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-        /*type*/ schemaObjectOrRefType($refs, param.schema).node,
-        /*initializer*/ undefined
+        undefined,
+        undefined,
+        ts.factory.createIdentifier("params"),
+        ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+        ts.factory.createTypeLiteralNode(
+          queryParams
+            .sort((x, y) =>
+              x.required === y.required ? 0 : x.required ? -1 : 1
+            ) // put all optional values at the end
+            .map((param) =>
+              ts.factory.createPropertySignature(
+                undefined,
+                ts.factory.createIdentifier(param.name),
+                param.required
+                  ? undefined
+                  : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+                schemaObjectOrRefType($refs, param.schema).node
+              )
+            )
+        )
       ),
-    }));
+    });
+  }
 
   if (item.requestBody) {
     const payload = ts.factory.createIdentifier("payload");
@@ -246,7 +270,7 @@ function makeAxiosRequestGenericType(
       {
         statusType: StatusType;
         schemas: ReturnType<typeof schemaObjectOrRefType>[];
-      }
+      },
     ]
   | [] {
   const obj = isReferenceObject(resOrRef)
@@ -351,10 +375,17 @@ function makeRequest(
     options.replacer
   );
 
-  const paramObjects = combineUniqueParams($refs, pathParams, item.parameters);
-  const arrowFuncParams = createRequestParams(item, paramObjects, $refs).map(
-    (param) => param.arrowFuncParam
+  const { queryParams, pathParams: otherParams } = combineUniqueParams(
+    $refs,
+    pathParams,
+    item.parameters
   );
+  const arrowFuncParams = createRequestParams(
+    item,
+    queryParams,
+    otherParams,
+    $refs
+  ).map((param) => param.arrowFuncParam);
 
   const axiosRequestGenericType = getAxiosRequestGenericTypeResponse(
     item,
@@ -372,26 +403,11 @@ function makeRequest(
     ),
   ];
 
-  const queryParamObjects = paramObjects.filter(
-    (paramObject) => paramObject.in === "query"
-  );
-  const queryParamProperties = queryParamObjects.map((paramObject) =>
-    paramObject.required
-      ? ts.factory.createShorthandPropertyAssignment(
-          /*name*/ ts.factory.createIdentifier(paramObject.name),
-          /*objectAssignmentInitializer*/ undefined
-        )
-      : shorthandOptionalObjectLiteralSpread(paramObject.name)
-  );
-
-  if (queryParamProperties.length) {
+  if (queryParams.length) {
     axiosConfigFields.push(
       ts.factory.createPropertyAssignment(
         /*name*/ ts.factory.createIdentifier("params"),
-        /*initializer*/ ts.factory.createObjectLiteralExpression(
-          /*properties*/ queryParamProperties,
-          /*multiline*/ true
-        )
+        /*initializer*/ ts.factory.createIdentifier(/*properties*/ "params")
       ),
       ts.factory.createPropertyAssignment(
         /*name*/ ts.factory.createIdentifier("paramsSerializer"),

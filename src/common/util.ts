@@ -359,26 +359,55 @@ export function createParams(
   pathParams: OpenAPIV3.PathItemObject["parameters"]
 ) {
   if (!item.parameters && !pathParams) {
-    return [];
+    return { params: [], queryParams: [], otherParams: [] };
   }
 
-  const paramObjects = combineUniqueParams($refs, pathParams, item.parameters);
-  return paramObjects
-    .sort((x, y) => (x.required === y.required ? 0 : x.required ? -1 : 1)) // put all optional values at the end
-    .map((param) => ({
-      required: param.required ?? false,
-      name: ts.factory.createIdentifier(param.name),
+  const { queryParams, pathParams: otherParams } = combineUniqueParams(
+    $refs,
+    pathParams,
+    item.parameters
+  );
+  const itemParamsDeclarations = otherParams.map((p) => ({
+    required: p.required ?? false,
+    name: ts.factory.createIdentifier(p.name),
+    arrowFuncParam: ts.factory.createParameterDeclaration(
+      undefined,
+      undefined,
+      ts.factory.createIdentifier(p.name),
+      undefined,
+      schemaObjectOrRefType($refs, p.schema).node
+    ),
+  }));
+
+  if (queryParams.length) {
+    itemParamsDeclarations.push({
+      required: false,
+      name: ts.factory.createIdentifier("params"),
       arrowFuncParam: ts.factory.createParameterDeclaration(
-        /*modifiers*/ undefined,
-        /*dotDotDotToken*/ undefined,
-        /*name*/ ts.factory.createIdentifier(param.name),
-        /*questionToken*/ param.required
-          ? undefined
-          : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-        /*type*/ schemaObjectOrRefType($refs, param.schema).node,
-        /*initializer*/ undefined
+        undefined,
+        undefined,
+        ts.factory.createIdentifier("params"),
+        ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+        ts.factory.createTypeLiteralNode(
+          queryParams
+            .sort((x, y) =>
+              x.required === y.required ? 0 : x.required ? -1 : 1
+            ) // put all optional values at the end
+            .map((param) =>
+              ts.factory.createPropertySignature(
+                undefined,
+                ts.factory.createIdentifier(param.name),
+                param.required
+                  ? undefined
+                  : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+                schemaObjectOrRefType($refs, param.schema).node
+              )
+            )
+        )
       ),
-    }));
+    });
+  }
+  return { params: itemParamsDeclarations, queryParams, otherParams };
 }
 
 function resolveParams(
@@ -408,17 +437,10 @@ export function combineUniqueParams(
 ) {
   const pathParamsResolved = resolveParams($refs, pathParams);
   const itemParamsResolved = resolveParams($refs, itemParams);
+  const combined = [...pathParamsResolved, ...itemParamsResolved];
 
-  if (!pathParamsResolved.length) {
-    return itemParamsResolved;
-  } else if (!itemParamsResolved.length) {
-    return pathParamsResolved;
-  }
-
-  const paramKey = (p: OpenAPIV3.ParameterObject) => `${p.name}-${p.in}`;
-  const itemParamIds = new Set(itemParamsResolved.map(paramKey));
-  return [
-    ...itemParamsResolved,
-    ...pathParamsResolved.filter((p) => !itemParamIds.has(paramKey(p))),
-  ];
+  return {
+    queryParams: combined.filter((p) => p.in === "query"),
+    pathParams: combined.filter((p) => p.in !== "query"),
+  };
 }
