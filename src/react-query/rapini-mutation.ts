@@ -3,6 +3,66 @@ import ts from "typescript";
 export const RAPINI_MUTATION_ID = "useRapiniMutation";
 
 export function makeRapiniMutation() {
+  const makeForwardingHandler = (
+    name: "onSuccess" | "onError" | "onSettled"
+  ) => {
+    return ts.factory.createPropertyAssignment(
+      ts.factory.createIdentifier(name),
+      ts.factory.createArrowFunction(
+        undefined,
+        undefined,
+        [
+          ts.factory.createParameterDeclaration(
+            undefined,
+            ts.factory.createToken(ts.SyntaxKind.DotDotDotToken),
+            ts.factory.createIdentifier("args"),
+            undefined,
+            undefined,
+            undefined
+          ),
+        ],
+        undefined,
+        ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+        ts.factory.createBlock(
+          [
+            ts.factory.createExpressionStatement(
+              ts.factory.createCallChain(
+                ts.factory.createPropertyAccessChain(
+                  ts.factory.createIdentifier("conf"),
+                  ts.factory.createToken(ts.SyntaxKind.QuestionDotToken),
+                  ts.factory.createIdentifier(name)
+                ),
+                ts.factory.createToken(ts.SyntaxKind.QuestionDotToken),
+                undefined,
+                [
+                  ts.factory.createSpreadElement(
+                    ts.factory.createIdentifier("args")
+                  ),
+                ]
+              )
+            ),
+            ts.factory.createExpressionStatement(
+              ts.factory.createCallChain(
+                ts.factory.createIdentifier(name),
+                ts.factory.createToken(ts.SyntaxKind.QuestionDotToken),
+                undefined,
+                [
+                  ts.factory.createSpreadElement(
+                    ts.factory.createIdentifier("args")
+                  ),
+                ]
+              )
+            ),
+          ],
+          true
+        )
+      )
+    );
+  };
+  const forwardingHandlers = ["onSuccess", "onError", "onSettled"].map(
+    (handler) =>
+      makeForwardingHandler(handler as "onSuccess" | "onError" | "onSettled")
+  );
   return ts.factory.createFunctionDeclaration(
     undefined,
     undefined,
@@ -28,7 +88,7 @@ export function makeRapiniMutation() {
       ),
       ts.factory.createTypeParameterDeclaration(
         undefined,
-        ts.factory.createIdentifier("TContext"),
+        ts.factory.createIdentifier("TOnMutateResult"),
         undefined,
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword)
       ),
@@ -93,7 +153,7 @@ export function makeRapiniMutation() {
                     undefined
                   ),
                   ts.factory.createTypeReferenceNode(
-                    ts.factory.createIdentifier("TContext"),
+                    ts.factory.createIdentifier("TOnMutateResult"),
                     undefined
                   ),
                 ]
@@ -138,7 +198,7 @@ export function makeRapiniMutation() {
                   undefined
                 ),
                 ts.factory.createTypeReferenceNode(
-                  ts.factory.createIdentifier("TContext"),
+                  ts.factory.createIdentifier("TOnMutateResult"),
                   undefined
                 ),
               ]
@@ -167,7 +227,7 @@ export function makeRapiniMutation() {
           undefined
         ),
         ts.factory.createTypeReferenceNode(
-          ts.factory.createIdentifier("TContext"),
+          ts.factory.createIdentifier("TOnMutateResult"),
           undefined
         ),
       ]
