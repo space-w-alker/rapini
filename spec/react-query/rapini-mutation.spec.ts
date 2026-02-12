@@ -6,17 +6,20 @@ const expected = `function useRapiniMutation<TData = unknown, TError = unknown, 
     const queryClient = useQueryClient();
     const conf = config?.(queryClient);
     const mutationOptions: typeof options = {
-        onSuccess: (data: TData, variables: TVariables, context?: TContext) => {
-            conf?.onSuccess?.(data, variables, context);
-            onSuccess?.(data, variables, context);
+        onSuccess: (data: TData, variables: TVariables, onMutateResult: TContext | undefined, context: any) => {
+            const ctx = onMutateResult as TContext;
+            conf?.onSuccess?.(data, variables, ctx, context);
+            onSuccess?.(data, variables, ctx, context);
         },
-        onError: (error: TError, variables: TVariables, context?: TContext) => {
-            conf?.onError?.(error, variables, context);
-            onError?.(error, variables, context);
+        onError: (error: TError, variables: TVariables, onMutateResult: TContext | undefined, context: any) => {
+            const ctx = onMutateResult as TContext;
+            conf?.onError?.(error, variables, ctx, context);
+            onError?.(error, variables, ctx, context);
         },
-        onSettled: (data: TData | undefined, error: TError | null, variables: TVariables, context?: TContext) => {
-            conf?.onSettled?.(data, error, variables, context);
-            onSettled?.(data, error, variables, context);
+        onSettled: (data: TData | undefined, error: TError | null, variables: TVariables, onMutateResult: TContext | undefined, context: any) => {
+            const ctx = onMutateResult as TContext;
+            conf?.onSettled?.(data, error, variables, ctx, context);
+            onSettled?.(data, error, variables, ctx, context);
         },
         ...rest
     };

@@ -298,11 +298,26 @@ export function makeRapiniMutation() {
                           ts.factory.createParameterDeclaration(
                             undefined,
                             undefined,
+                            ts.factory.createIdentifier("onMutateResult"),
+                            undefined,
+                            ts.factory.createUnionTypeNode([
+                              ts.factory.createTypeReferenceNode(
+                                ts.factory.createIdentifier("TContext"),
+                                undefined
+                              ),
+                              ts.factory.createKeywordTypeNode(
+                                ts.SyntaxKind.UndefinedKeyword
+                              ),
+                            ]),
+                            undefined
+                          ),
+                          ts.factory.createParameterDeclaration(
+                            undefined,
+                            undefined,
                             ts.factory.createIdentifier("context"),
                             undefined,
-                            ts.factory.createTypeReferenceNode(
-                              ts.factory.createIdentifier("TContext"),
-                              undefined
+                            ts.factory.createKeywordTypeNode(
+                              ts.SyntaxKind.AnyKeyword
                             ),
                             undefined
                           ),
@@ -313,6 +328,26 @@ export function makeRapiniMutation() {
                         ),
                         ts.factory.createBlock(
                           [
+                            ts.factory.createVariableStatement(
+                              undefined,
+                              ts.factory.createVariableDeclarationList(
+                                [
+                                  ts.factory.createVariableDeclaration(
+                                    ts.factory.createIdentifier("ctx"),
+                                    undefined,
+                                    undefined,
+                                    ts.factory.createAsExpression(
+                                      ts.factory.createIdentifier("onMutateResult"),
+                                      ts.factory.createTypeReferenceNode(
+                                        ts.factory.createIdentifier("TContext"),
+                                        undefined
+                                      )
+                                    )
+                                  ),
+                                ],
+                                ts.NodeFlags.Const
+                              )
+                            ),
                             ts.factory.createExpressionStatement(
                               ts.factory.createCallChain(
                                 ts.factory.createPropertyAccessChain(
@@ -329,6 +364,7 @@ export function makeRapiniMutation() {
                                 [
                                   ts.factory.createIdentifier("data"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
@@ -343,6 +379,7 @@ export function makeRapiniMutation() {
                                 [
                                   ts.factory.createIdentifier("data"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
@@ -383,11 +420,26 @@ export function makeRapiniMutation() {
                           ts.factory.createParameterDeclaration(
                             undefined,
                             undefined,
+                            ts.factory.createIdentifier("onMutateResult"),
+                            undefined,
+                            ts.factory.createUnionTypeNode([
+                              ts.factory.createTypeReferenceNode(
+                                ts.factory.createIdentifier("TContext"),
+                                undefined
+                              ),
+                              ts.factory.createKeywordTypeNode(
+                                ts.SyntaxKind.UndefinedKeyword
+                              ),
+                            ]),
+                            undefined
+                          ),
+                          ts.factory.createParameterDeclaration(
+                            undefined,
+                            undefined,
                             ts.factory.createIdentifier("context"),
-                            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-                            ts.factory.createTypeReferenceNode(
-                              ts.factory.createIdentifier("TContext"),
-                              undefined
+                            undefined,
+                            ts.factory.createKeywordTypeNode(
+                              ts.SyntaxKind.AnyKeyword
                             ),
                             undefined
                           ),
@@ -398,6 +450,26 @@ export function makeRapiniMutation() {
                         ),
                         ts.factory.createBlock(
                           [
+                            ts.factory.createVariableStatement(
+                              undefined,
+                              ts.factory.createVariableDeclarationList(
+                                [
+                                  ts.factory.createVariableDeclaration(
+                                    ts.factory.createIdentifier("ctx"),
+                                    undefined,
+                                    undefined,
+                                    ts.factory.createAsExpression(
+                                      ts.factory.createIdentifier("onMutateResult"),
+                                      ts.factory.createTypeReferenceNode(
+                                        ts.factory.createIdentifier("TContext"),
+                                        undefined
+                                      )
+                                    )
+                                  ),
+                                ],
+                                ts.NodeFlags.Const
+                              )
+                            ),
                             ts.factory.createExpressionStatement(
                               ts.factory.createCallChain(
                                 ts.factory.createPropertyAccessChain(
@@ -414,6 +486,7 @@ export function makeRapiniMutation() {
                                 [
                                   ts.factory.createIdentifier("error"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
@@ -428,6 +501,7 @@ export function makeRapiniMutation() {
                                 [
                                   ts.factory.createIdentifier("error"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
@@ -489,11 +563,26 @@ export function makeRapiniMutation() {
                           ts.factory.createParameterDeclaration(
                             undefined,
                             undefined,
+                            ts.factory.createIdentifier("onMutateResult"),
+                            undefined,
+                            ts.factory.createUnionTypeNode([
+                              ts.factory.createTypeReferenceNode(
+                                ts.factory.createIdentifier("TContext"),
+                                undefined
+                              ),
+                              ts.factory.createKeywordTypeNode(
+                                ts.SyntaxKind.UndefinedKeyword
+                              ),
+                            ]),
+                            undefined
+                          ),
+                          ts.factory.createParameterDeclaration(
+                            undefined,
+                            undefined,
                             ts.factory.createIdentifier("context"),
-                            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-                            ts.factory.createTypeReferenceNode(
-                              ts.factory.createIdentifier("TContext"),
-                              undefined
+                            undefined,
+                            ts.factory.createKeywordTypeNode(
+                              ts.SyntaxKind.AnyKeyword
                             ),
                             undefined
                           ),
@@ -504,6 +593,26 @@ export function makeRapiniMutation() {
                         ),
                         ts.factory.createBlock(
                           [
+                            ts.factory.createVariableStatement(
+                              undefined,
+                              ts.factory.createVariableDeclarationList(
+                                [
+                                  ts.factory.createVariableDeclaration(
+                                    ts.factory.createIdentifier("ctx"),
+                                    undefined,
+                                    undefined,
+                                    ts.factory.createAsExpression(
+                                      ts.factory.createIdentifier("onMutateResult"),
+                                      ts.factory.createTypeReferenceNode(
+                                        ts.factory.createIdentifier("TContext"),
+                                        undefined
+                                      )
+                                    )
+                                  ),
+                                ],
+                                ts.NodeFlags.Const
+                              )
+                            ),
                             ts.factory.createExpressionStatement(
                               ts.factory.createCallChain(
                                 ts.factory.createPropertyAccessChain(
@@ -521,6 +630,7 @@ export function makeRapiniMutation() {
                                   ts.factory.createIdentifier("data"),
                                   ts.factory.createIdentifier("error"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
@@ -536,6 +646,7 @@ export function makeRapiniMutation() {
                                   ts.factory.createIdentifier("data"),
                                   ts.factory.createIdentifier("error"),
                                   ts.factory.createIdentifier("variables"),
+                                  ts.factory.createIdentifier("ctx"),
                                   ts.factory.createIdentifier("context"),
                                 ]
                               )
